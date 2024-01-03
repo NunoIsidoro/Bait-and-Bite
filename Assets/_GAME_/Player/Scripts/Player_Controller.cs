@@ -1,15 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 [SelectionBase]
 public class Player_Controller : MonoBehaviour
 {
-    [Header("Movement Attributes")]
-    [SerializeField] private float _moveSpeed = 50f;
 
     [Header("Dependencies")]
-    [SerializeField] private Rigidbody2D _rigidbody;
+    [SerializeField] private NavMeshAgent _agent;
 
     [Header("Animation")]
     [SerializeField] private Animator _animator;
@@ -17,40 +14,63 @@ public class Player_Controller : MonoBehaviour
     [Header("Sprite Renderer")]
     [SerializeField] private SpriteRenderer _spriteRenderer;
 
-    private Vector2 _moveDir = Vector2.zero;
+    private Camera _cam;
+    private Vector3 _target;
+    private bool _isMovingToTarget = false;
+
+    private void Start()
+    {
+        _cam = Camera.main;
+        _agent.speed = 3.5f;
+        _agent.stoppingDistance = 0.5f;
+        _agent.updateRotation = false;
+        _agent.updateUpAxis = false;
+    }
 
     private void Update()
     {
-        GatherInput();
-    }
+        if (Input.GetMouseButtonDown(0))
+        {
+            _target = _cam.ScreenToWorldPoint(Input.mousePosition);
+            _target.z = transform.position.z;
+            _agent.SetDestination(_target);
+            _isMovingToTarget = true;
+        }
 
-    private void FixedUpdate()
-    {
-        MovementUpdate();
+        if (_isMovingToTarget)
+        {
+            if (!_agent.pathPending)
+            {
+                if (_agent.remainingDistance <= _agent.stoppingDistance)
+                {
+                    // Check if the path is complete
+                    if (_agent.hasPath && _agent.velocity.sqrMagnitude == 0f)
+                    {
+                        _isMovingToTarget = false;
+                        _agent.ResetPath(); // Reset the path to stop the agent
+                    }
+                }
+            }
+        }
+
         HandleAnimation();
-    }
-
-    private void GatherInput()
-    {
-        _moveDir.x = Input.GetAxisRaw("Horizontal");
-        _moveDir.y = Input.GetAxisRaw("Vertical");
-    }
-
-    private void MovementUpdate()
-    {
-        _rigidbody.velocity = _moveDir * _moveSpeed * Time.fixedDeltaTime;
     }
 
     private void HandleAnimation()
     {
-        // Atualiza os parâmetros do Animator com base na direção do movimento
-        _animator.SetFloat("moveX", _moveDir.x);
-        _animator.SetFloat("moveY", _moveDir.y);
+        Vector2 moveDir = _agent.desiredVelocity;
 
-        // Ajustar a direção do sprite baseado no movimento horizontal
-        if (_moveDir.x != 0)
+        if (_isMovingToTarget)
         {
-            _spriteRenderer.flipX = _moveDir.x < 0;
+            _animator.SetFloat("moveX", moveDir.x);
+            _animator.SetFloat("moveY", moveDir.y);
+            _animator.SetBool("isWalking", moveDir.magnitude > 0);
+
+            _spriteRenderer.flipX = moveDir.x < 0;
+        }
+        else
+        {
+            _animator.SetBool("isWalking", false);
         }
     }
 }
