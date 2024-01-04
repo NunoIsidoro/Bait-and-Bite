@@ -249,10 +249,10 @@ public class FishData
 {
     public string uid;
     public FishType fishType;
-    public float vel; // Velocity
-    public float resistence; // Chance to die from natural causes
-    public int age; // Has higher chance to die as it gets older
-    public float size; // The bigger the fish, the more it eats
+    public float vel;
+    public float resistence; 
+    public int age; 
+    public float size; 
     public bool isSwimming;
 
     public FishData(FishType fishType, float vel, float resistence, int age, float size)
