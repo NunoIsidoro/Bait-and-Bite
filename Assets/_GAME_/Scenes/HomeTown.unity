@@ -142554,7 +142554,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: '<color=#B3B5C7><size=65%>Puffer Fish:</size></color>
 
-    275'
+    0'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ca247a3092b7b404dbaa6f4ab43e450c, type: 2}
   m_sharedMaterial: {fileID: -403277894513911722, guid: ca247a3092b7b404dbaa6f4ab43e450c, type: 2}
@@ -142875,6 +142875,7 @@ GameObject:
   m_Component:
   - component: {fileID: 927571225424221663}
   - component: {fileID: 6928173180877850972}
+  - component: {fileID: 6928173180877850973}
   m_Layer: 5
   m_Name: FishInfo
   m_TagString: Untagged
@@ -143377,7 +143378,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: '<color=#B3B5C7><size=65%>Sardine</size></color>
 
-    487'
+    0'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ca247a3092b7b404dbaa6f4ab43e450c, type: 2}
   m_sharedMaterial: {fileID: -403277894513911722, guid: ca247a3092b7b404dbaa6f4ab43e450c, type: 2}
@@ -143639,7 +143640,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: '<color=#B3B5C7><size=65%>Tuna</size></color>
 
-    245'
+    0'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ca247a3092b7b404dbaa6f4ab43e450c, type: 2}
   m_sharedMaterial: {fileID: -403277894513911722, guid: ca247a3092b7b404dbaa6f4ab43e450c, type: 2}
@@ -143915,6 +143916,21 @@ MonoBehaviour:
   - {fileID: 4813928545882232705}
   - {fileID: 7647856713052184827}
   - {fileID: 5682989320288976201}
+--- !u!114 &6928173180877850973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3225571018567392163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e84b9460224498643beaf5b94b8ce8ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sardine: {fileID: 5409151826575729515}
+  puffer: {fileID: 1687950162645542139}
+  tuna: {fileID: 5859296557260323163}
 --- !u!114 &7259345474450297957
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -12,8 +12,8 @@ public class FishGenerator : MonoBehaviour
 
     public float maxX;
     public float minX;
-    float minY;
-    float maxY;
+    public float minY;
+    public float maxY;
     private GameObject[] fishes;
 
     private List<FishData> population => GeneticAlgorithm.population;
@@ -54,6 +54,7 @@ public class FishGenerator : MonoBehaviour
             // Escolhe o prefab baseado no tipo de peixe
             GameObject fishPrefab = GetFishPrefab(selectedFishData.fishType);
             GameObject newFish = Instantiate(fishPrefab, pos, Quaternion.identity);
+            newFish.name = selectedFishData.uid;
             newFish.GetComponent<Fish>().SetData(selectedFishData, leftSided);
 
             // Rotaciona o peixe se necessário

@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+[System.Serializable]
+public class FishDataList
+{
+    public List<FishData> list;
+}
+
 public class GeneticAlgorithm : MonoBehaviour
 {
     static public List<FishData> population;
@@ -23,8 +29,9 @@ public class GeneticAlgorithm : MonoBehaviour
         mutationRate = 0.01f; // Taxa de mutação, ajuste conforme necessário
         generation = 1;
 
-        if (PlayerPrefs.HasKey("PopulationData"))
+        if (PlayerPrefs.HasKey("Population"))
         {
+            Debug.Log("Loading population");
             LoadPopulation(); // Carrega a população salva
         }
         else
@@ -47,17 +54,25 @@ public class GeneticAlgorithm : MonoBehaviour
 
     static public void SavePopulation()
     {
-        string data = JsonUtility.ToJson(population);
+        // Make all fish not swin in population
+        foreach (FishData fishData in population)
+            fishData.isSwimming = false;
+
+        FishDataList dataList = new FishDataList { list = population };
+        string data = JsonUtility.ToJson(dataList);
+
         PlayerPrefs.SetString("Population", data);
 
         PlayerPrefs.SetInt("Generation", generation);
     }
 
 
-    private void LoadPopulation()
+    static public void LoadPopulation()
     {
         string data = PlayerPrefs.GetString("Population");
-        population = JsonUtility.FromJson<List<FishData>>(data);
+
+        FishDataList dataList = JsonUtility.FromJson<FishDataList>(data);
+        population = dataList.list;
 
         generation = PlayerPrefs.GetInt("Generation");
     }
@@ -67,16 +82,16 @@ public class GeneticAlgorithm : MonoBehaviour
     {
         population = new List<FishData>
         {
-            new FishData(FishType.PufferFish, 1.0f, 0.9f, 1, 1.0f),
-            new FishData(FishType.Sardine, 2.0f, 0.8f, 2, 1.8f),
-            new FishData(FishType.Tuna, 0.8f, 0.85f, 1, 0.5f),
-            new FishData(FishType.PufferFish, 0.95f, 1.1f, 2, 1.2f),
-            new FishData(FishType.Sardine, 2.1f, 0.93f, 3, 1.9f),
-            new FishData(FishType.Tuna, 0.9f, 0.9f, 2, 0.6f),
-            new FishData(FishType.PufferFish, 1.3f, 0.75f, 3, 1.3f),
-            new FishData(FishType.Sardine, 2.2f, 0.7f, 4, 2.0f),
-            new FishData(FishType.Tuna, 1.0f, 0.87f, 1, 0.7f),
-            new FishData(FishType.PufferFish, 1.4f, 0.95f, 5, 1.4f)
+            new FishData(FishType.PufferFish, 1.0f, 0.4f, 1, 1.0f),
+            new FishData(FishType.Sardine, 2.0f, 0.3f, 2, 1.8f),
+            new FishData(FishType.Tuna, 0.8f, 0.35f, 1, 0.5f),
+            new FishData(FishType.PufferFish, 0.45f, 1.1f, 2, 1.2f),
+            new FishData(FishType.Sardine, 2.1f, 0.43f, 3, 1.9f),
+            new FishData(FishType.Tuna, 0.9f, 0.4f, 2, 0.6f),
+            new FishData(FishType.PufferFish, 1.3f, 0.35f, 3, 1.3f),
+            new FishData(FishType.Sardine, 2.2f, 0.2f, 4, 2.0f),
+            new FishData(FishType.Tuna, 1.0f, 0.37f, 1, 0.7f),
+            new FishData(FishType.PufferFish, 1.4f, 0.55f, 5, 1.4f)
         };
 
         Debug.Log("Initial population created: " + population.Count);
@@ -88,7 +103,7 @@ public class GeneticAlgorithm : MonoBehaviour
         List<FishData> newPopulation = new List<FishData>(population); // Inicia com a população atual
 
         // Define um fator de proporção para reprodução
-        int reproductionFactor = 10; // Uma reprodução para cada 10 peixes
+        int reproductionFactor = 5; // Uma reprodução para cada 10 peixes
         // Determina o número de reproduções com base no tamanho da população
         int numberOfReproductions = Mathf.Max(1, population.Count / reproductionFactor);
 
@@ -127,14 +142,16 @@ public class GeneticAlgorithm : MonoBehaviour
             }
             catch (System.Exception)
             {
-                throw;
             }
         }
+
+        Debug.Log("New Population: " + newPopulation.Count);
 
         population = newPopulation;
         generation++;
         ManageFoodSuply();
     }
+
 
     private FishData SelectParent(List<FishData> fishes)
     {
@@ -195,16 +212,17 @@ public class GeneticAlgorithm : MonoBehaviour
         }
     }
 
+
     private void ManageFoodSuply()
     {
-        // Restore 40% of food at the beginning
-        foodSuply = maxFoodSupply * 0.4f;
+        // Restore 100% of food at the beginning
+        foodSuply = maxFoodSupply;
 
         float totalFoodConsumed = 0f;
         foreach (FishData fish in population)
         {
             // Define o consumo de comida baseado no tamanho do peixe, por exemplo
-            float foodConsumed = fish.size * 1.25f; // Ajuste este fator conforme necessário
+            float foodConsumed = fish.size * 3.25f; // Ajuste este fator conforme necessário
             totalFoodConsumed += foodConsumed;
         }
 
@@ -219,21 +237,31 @@ public class GeneticAlgorithm : MonoBehaviour
         }
     }
 
+
     private void TryToKillFishes()
     {
-        List<FishData> survivingFish = new List<FishData>();
-
-        foreach (FishData fish in population)
+        for (int i = population.Count - 1; i >= 0; i--)
         {
-            float chanceToSurvive = fish.resistence; // Resistência como porcentagem de chance de sobreviver
+            FishData fish = population[i];
+            float chanceToSurvive = fish.resistence; // Resistência como percentagem de chance de sobreviver
             float randomChance = Random.Range(0f, 100f); // Gera um número aleatório entre 0 e 100
 
-            if (randomChance <= chanceToSurvive)
+            if (randomChance > chanceToSurvive * 100f)
             {
-                survivingFish.Add(fish);
+                GameObject fishGameObject = GameObject.Find(fish.uid);
+                if (fishGameObject != null)
+                {
+                    fishGameObject.GetComponent<Fish>().currentState = FishState.Dead;
+                    Debug.Log($"Fish {fish.uid} died of starvation");
+                }
+                else
+                {
+                    Debug.Log($"Fish GameObject with UID {fish.uid} not found");
+                }
+
+                // Se o peixe não sobreviver, remove-o da população
+                population.RemoveAt(i);
             }
         }
-
-        population = survivingFish; 
     }
 }
