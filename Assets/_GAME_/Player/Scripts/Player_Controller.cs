@@ -4,7 +4,6 @@ using UnityEngine.AI;
 [SelectionBase]
 public class Player_Controller : MonoBehaviour
 {
-
     [Header("Dependencies")]
     [SerializeField] private NavMeshAgent _agent;
 
@@ -18,6 +17,8 @@ public class Player_Controller : MonoBehaviour
     private Vector3 _target;
     private bool _isMovingToTarget = false;
 
+    public bool canMove = true; // Variável para controlar a capacidade de movimento do jogador
+
     private void Start()
     {
         _cam = Camera.main;
@@ -29,7 +30,7 @@ public class Player_Controller : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (canMove && Input.GetMouseButtonDown(0))
         {
             _target = _cam.ScreenToWorldPoint(Input.mousePosition);
             _target.z = transform.position.z;
@@ -37,13 +38,12 @@ public class Player_Controller : MonoBehaviour
             _isMovingToTarget = true;
         }
 
-        if (_isMovingToTarget)
+        if (_isMovingToTarget && canMove)
         {
             if (!_agent.pathPending)
             {
                 if (_agent.remainingDistance <= _agent.stoppingDistance)
                 {
-                    // Check if the path is complete
                     if (_agent.hasPath && _agent.velocity.sqrMagnitude == 0f)
                     {
                         _isMovingToTarget = false;
@@ -53,7 +53,10 @@ public class Player_Controller : MonoBehaviour
             }
         }
 
-        HandleAnimation();
+        if (canMove)
+        {
+            HandleAnimation();
+        }
     }
 
     private void HandleAnimation()
@@ -64,13 +67,13 @@ public class Player_Controller : MonoBehaviour
         {
             _animator.SetFloat("moveX", moveDir.x);
             _animator.SetFloat("moveY", moveDir.y);
-            _animator.SetBool("isWalking", moveDir.magnitude > 0);
+            //_animator.SetBool("isWalking", moveDir.magnitude > 0);
 
             _spriteRenderer.flipX = moveDir.x < 0;
         }
         else
         {
-            _animator.SetBool("isWalking", false);
+            //_animator.SetBool("isWalking", false);
         }
     }
 }
